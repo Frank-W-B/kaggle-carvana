@@ -1,0 +1,61 @@
+Nov 14, 2014 
+SegNet: A Deep Convolutional Encoder-Decoder Architecture for Robust
+Semantic Pixel-Wise Labelling
+Original SegNet 7x7 filters, 64 features per layer, 106 x 106 pixels, relu
+    (encoder), non-overlapping max-pooling layer (2, 2), encoder & decoder 
+    untied, local contrast normalization on the input,  Limited-memory BFGS 
+    (L-BFGS or LM-BFGS) for the optimizatizer, weights initialized zero 
+    mean unit variance, didn't tune learning rate, mini-batch size 25-30
+    trained layers individually - roughly through dataset in 10 epochs - each
+    datapoint affects weights 200 times, 4 encoders 4 decoders, NVIDIA Tesla K40,
+    GTX GeForce 880M,  GTXGeForce780 GPUs. 367 images 360 x 480 took about a week.
+    2 secs/frame.  Predictions get smoother as depth is increased. 
+    Has to learning to upsample.
+
+10 Apr 2015
+VGG (Visual Geometry Group) from Oxford, won ImageNet in 2014
+VERY DEEP CONVOLUTIONAL NETWORKS
+FOR LARGE -SCALE IMAGE RECOGNITION
+Karen Simonyan ∗ & Andrew Zisserman
+Supported by NVIDIA (GPUs donated by NVIDIA)
+Increase depth using 3x3 filters, computationally ok to add more layers because 
+    the filter is small. Used 224 x 224 images.  Only pre-processing is subtracing
+    the mean RGB value from the training set from all pixels. 5 max pooling layers
+    instead of 4.  Same max-pooling.  Have 3 fully connected layers in the middle.
+    Don't use normalization except for one layer.  Width of conv layers goes from
+    64 to 512 in factors of 2. 64, 128, 256, 512.  Roughly 144 M weights. 2 3x3 layers
+    is 5x5, 3 is 7x7. SGD, momentum 0.9, weight decay (L2 to 5e-4), learning rate  
+    of 0.001, batch size of 256, 370k iterations, 74 epochs. Initialization difficult
+    but found that Glorot initialization worked ok. Regarding training images, 
+    can resize them or use crops with a fixed scale.  Cropping, instead of resizing
+    whole image, can lead to increased accuracy.  In competition multi-crop slightly
+    outperformed, whole image. Downside is increased computation time.
+    4 NVIDIA Titan Black GPUs, training a single net took 2–3 weeks. Dataset: 1000 
+    classes, and is split into three sets: training (1.3M images), validation (50K images), 
+    and testing (100K images with held-out class labels).
+
+10 October 2016
+SegNet: A Deep Convolutional
+Encoder-Decoder Architecture for Image
+Segmentation
+Vijay Badrinarayanan, Alex Kendall, Roberto Cipolla, Senior Member, IEEE,
+
+Topologically identical to VGG16. Novelty of SegNet lies is in the manner in 
+    which the decoder upsamples its lower resolution input feature map(s). 
+    Specifically, the decoder uses pooling indices computed in the max-pooling 
+    step of the corresponding encoder to perform non-linear upsampling. This 
+    eliminates the need for learning to upsample.  Smaller in the number of 
+    trainable parameters than other competing architectures and can be trained 
+    end-to-end using stochastic gradient descent.
+    Nice picture of network in paper.  13 convolutional, 13 decoder layers.
+    Encoder: Convolution->BatchNormalization->Relu->MaxPooling
+    Decoder: Upsample->Convolution->BatchNormalization
+    This dataset is small, consisting of
+    367 training and 233 testing RGB images (day and dusk scenes) at
+    360 × 480 resolution. The challenge is to segment 11 classes such
+    as road, building, cars, pedestrians, signs, poles, side-walk etc. We
+    perform local contrast normalization [54] to the RGB input.
+    The encoder and decoder weights were all initialized using the
+    technique described in He et al. [55]. To train all the variants we
+    use stochastic gradient descent (SGD) with a fixed learning rate
+    of 0.1 and momentum of 0.9 [17]
